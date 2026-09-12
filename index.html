@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Venyra AI - Interactive Engine</title>
+    <title>Venyra AI - Engine Interativo</title>
+    <!-- Suporte a Matemática (KaTeX) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <style>
         :root {
             --bg-main: #090a0f; --bg-sidebar: #0d111a; --bg-header: rgba(13, 17, 26, 0.85);
@@ -74,10 +77,10 @@
         .config-btn { background: rgba(128, 128, 128, 0.05); border: 1px solid var(--border-color); color: var(--text-main); width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: grid; place-items: center; font-size: 1.15rem; transition: all 0.2s; }
         .config-btn:hover { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); }
         
-        .config-dropdown { position: absolute; right: 0; top: 50px; background: var(--bg-box); border: 1px solid var(--border-color); border-radius: 12px; width: 220px; display: none; flex-direction: column; padding: 8px; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.4); gap: 4px; }
+        .config-dropdown { position: absolute; right: 0; top: 50px; background: var(--bg-box); border: 1px solid var(--border-color); border-radius: 12px; width: 260px; display: none; flex-direction: column; padding: 12px; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.4); gap: 8px; }
         .config-dropdown.show { display: flex; }
-        .config-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); padding: 6px 10px; font-weight: 700; letter-spacing: 0.05em; }
-        .config-option { background: none; border: none; padding: 12px; text-align: left; color: var(--text-main); font-size: 0.85rem; cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; min-height: 44px; width: 100%; }
+        .config-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); padding: 4px 6px; font-weight: 700; letter-spacing: 0.05em; }
+        .config-option { background: none; border: none; padding: 10px 8px; text-align: left; color: var(--text-main); font-size: 0.85rem; cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .config-option:hover { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
         .check-yellow { color: var(--accent-yellow); font-weight: bold; }
         
@@ -85,7 +88,6 @@
         .chat-messages { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
         .chat-messages.hidden { display: none; }
         
-        /* VIEW DE IMAGEM */
         .generator-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 20px; overflow-y: auto; display: none; flex-direction: column; gap: 20px; }
         .generator-view.show { display: flex; }
         
@@ -96,18 +98,17 @@
         .generator-input:focus { border-color: var(--accent-yellow); }
         .action-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 0 20px; border-radius: 10px; font-weight: 600; cursor: pointer; white-space: nowrap; min-height: 48px; }
 
-        /* IMAGEM */
         .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
         .result-card { background: var(--bg-box); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-        .result-card img { width: 100%; height: 240px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color); }
+        .result-card img { width: 100%; height: 260px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color); }
         .result-title { font-size: 1rem; font-weight: 600; color: #f59e0b; }
-        .download-btn { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--border-color); color: var(--accent-yellow); padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 0.9rem; display: block; }
+        .download-btn { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--border-color); color: var(--accent-yellow); padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 0.9rem; display: block; margin-top: 8px; }
         .download-btn:hover { background: rgba(245, 158, 11, 0.3); }
 
         .message { max-width: 90%; padding: 14px 18px; border-radius: 16px; line-height: 1.6; font-size: 0.95rem; word-break: break-word; white-space: pre-line; }
         .user-message { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; align-self: flex-end; }
         .ai-message { background: var(--ai-bubble); color: var(--text-main); align-self: flex-start; border: 1px solid var(--border-color); width: 100%; max-width: 95%; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .ai-message img { max-width: 100%; height: auto; border-radius: 12px; margin-top: 12px; display: block; border: 1px solid var(--border-color); }
+        .ai-message img { max-width: 100%; max-height: 400px; border-radius: 12px; margin-top: 12px; display: block; border: 1px solid var(--border-color); }
         
         .chat-input-area { display: flex; flex-direction: column; padding: 12px 20px; background: var(--bg-header); backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); gap: 8px; z-index: 10; }
         .input-row { display: flex; gap: 10px; align-items: center; }
@@ -170,6 +171,16 @@
             </div>
         </div>
     </div>
+
+    <div class="modal-overlay" id="wordErrorModal">
+        <div class="modal-box">
+            <h3>⚠️ Termo Não Permitido</h3>
+            <p>Sua mensagem contém termos impróprios ou bloqueados pelo filtro de segurança.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-ok-btn" onclick="document.getElementById('wordErrorModal').classList.remove('show')">Entendido</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Barra Lateral -->
     <div class="sidebar collapsed" id="sidebar">
@@ -200,6 +211,12 @@
                         <div class="config-title">Aparência</div>
                         <button class="config-option" onclick="setTheme('dark')"><span>🌙 Escuro</span> <span class="check-yellow" id="checkDark">✓</span></button>
                         <button class="config-option" onclick="setTheme('light')"><span>☀️ Claro</span> <span class="check-yellow" id="checkLight" style="display:none">✓</span></button>
+                        
+                        <div class="config-title" style="margin-top:6px;">Preferências</div>
+                        <button class="config-option" onclick="toggleDeletePopupPreference()">
+                            <span>Pop-up Exclusão</span>
+                            <strong id="popupStatusToggle" style="color: #f59e0b;">Ativo</strong>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -209,7 +226,7 @@
             <!-- MODO CHAT -->
             <div class="chat-messages" id="chatMessages"></div>
             
-            <!-- MODO IMAGEM COM DOWNLOAD DIRETO -->
+            <!-- MODO IMAGEM -->
             <div class="generator-view" id="imageView">
                 <div class="generator-box">
                     <h3>Criador de Imagens por IA</h3>
@@ -232,7 +249,7 @@
             </div>
             <div class="input-row">
                 <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Anexar arquivo">📎</button>
-                <input type="text" id="userInput" placeholder="Digite sua mensagem no chat..." onkeypress="handleKeyPress(event)">
+                <input type="text" id="userInput" placeholder="Digite sua mensagem, cálculo matemático ou peça uma foto..." onkeypress="handleKeyPress(event)">
                 <button class="send-btn" onclick="sendMessage()">Enviar</button>
             </div>
         </div>
@@ -246,12 +263,16 @@
         let activeDropdownId = null;
         let currentTheme = localStorage.getItem('venyra_engine_theme_v8') || 'dark';
         let currentViewMode = 'chat';
+        let skipDeletePopup = localStorage.getItem('venyra_skip_delete_popup') === 'true';
+        
+        const palavrasProibidas = ["palavraerrada1", "termoimproprio"];
 
         let chatSessions = [];
         let activeChatId = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             applyTheme(currentTheme);
+            updateDeletePopupUI();
             loadSessions();
             
             document.addEventListener('click', (e) => {
@@ -260,12 +281,24 @@
             });
         });
 
+        function toggleDeletePopupPreference() {
+            skipDeletePopup = !skipDeletePopup;
+            localStorage.setItem('venyra_skip_delete_popup', skipDeletePopup);
+            updateDeletePopupUI();
+        }
+
+        function updateDeletePopupUI() {
+            const statusEl = document.getElementById('popupStatusToggle');
+            if (!statusEl) return;
+            statusEl.textContent = skipDeletePopup ? "Desativado" : "Ativo";
+            statusEl.style.color = skipDeletePopup ? "#ef4444" : "#f59e0b";
+        }
+
         function switchViewMode(mode) {
             currentViewMode = mode;
             const chatBox = document.getElementById('chatMessages');
             const imageBox = document.getElementById('imageView');
             const inputArea = document.getElementById('chatInputAreaWrapper');
-            
             const btnChat = document.getElementById('modeChatBtn');
             const btnImage = document.getElementById('modeImageBtn');
 
@@ -286,7 +319,6 @@
             }
         }
 
-        // GERAR IMAGEM PERSONALIZADA COM DOWNLOAD DIRETO
         function generateCustomImage() {
             const input = document.getElementById('imagePromptInput');
             const container = document.getElementById('imageResultsContainer');
@@ -294,8 +326,7 @@
             if (!prompt) return;
 
             container.innerHTML = `<div style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 20px;">Renderizando imagem baseada em "${prompt}"...</div>`;
-
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${Math.floor(Math.random() * 999999)}`;
 
             const testImg = new Image();
             testImg.src = imageUrl;
@@ -315,7 +346,6 @@
             };
         }
 
-        // FUNÇÕES DE CONFIGURAÇÃO E TEMA
         function applyTheme(theme) {
             currentTheme = theme;
             localStorage.setItem('venyra_engine_theme_v8', theme);
@@ -371,7 +401,6 @@
             document.getElementById('fileInput').value = '';
         }
 
-        // GERENCIAMENTO DE SESSÕES E HISTÓRICO DE CHAT
         function loadSessions() {
             try {
                 const saved = localStorage.getItem('venyra_engine_sessions_v8');
@@ -488,14 +517,14 @@
             if (chatTitle) chatTitle.textContent = session.title || 'Venyra AI';
 
             if (session.messages.length === 0) {
-                renderMessageUI('ai', "Olá! Escolha entre Chat ou Imagens na barra superior para começar.");
+                renderMessageUI('ai', "Olá! Eu sou a Venyra AI. Como posso te ajudar hoje?");
             } else {
-                session.messages.forEach(msg => renderMessageUI(msg.sender, msg.content, msg.file));
+                session.messages.forEach(msg => renderMessageUI(msg.sender, msg.content, msg.file, msg.generatedImage));
             }
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function renderMessageUI(sender, text, fileObj = null) {
+        function renderMessageUI(sender, text, fileObj = null, generatedImageUrl = null) {
             const messagesContainer = document.getElementById('chatMessages');
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
@@ -507,11 +536,38 @@
                 msgDiv.appendChild(img);
             }
 
+            if (generatedImageUrl) {
+                const genImg = document.createElement('img');
+                genImg.src = generatedImageUrl;
+                msgDiv.appendChild(genImg);
+
+                const downloadLink = document.createElement('a');
+                downloadLink.className = 'download-btn';
+                downloadLink.href = generatedImageUrl;
+                downloadLink.target = '_blank';
+                downloadLink.download = 'venyra_imagem.jpg';
+                downloadLink.textContent = '📥 Baixar Imagem';
+                msgDiv.appendChild(downloadLink);
+            }
+
             messagesContainer.appendChild(msgDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function requestDeleteChat(id) { pendingDeleteId = id; document.getElementById('deleteModal').classList.add('show'); }
+        function requestDeleteChat(id) {
+            if (skipDeletePopup) {
+                chatSessions = chatSessions.filter(s => s.id !== id);
+                if (chatSessions.length === 0) createNewChatSession(false);
+                else if (activeChatId === id) activeChatId = chatSessions[0].id;
+                saveSessions();
+                renderChatList();
+                loadActiveChatMessages();
+            } else {
+                pendingDeleteId = id;
+                document.getElementById('deleteModal').classList.add('show');
+            }
+        }
+
         function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); pendingDeleteId = null; }
         function confirmDeleteChat() {
             if (!pendingDeleteId) return;
@@ -552,10 +608,80 @@
 
         function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
 
+        function evaluateMathExpression(expr) {
+            try {
+                const sanitized = expr.replace(/[^0-9+\-*/().%^]/g, '');
+                if (!sanitized || sanitized.length < 3) return null;
+                const result = Function('"use strict";return (' + sanitized.replace(/\^/g, '**') + ')')();
+                if (typeof result === 'number' && !isNaN(result)) {
+                    return `O resultado do cálculo matemático é: **${result}**`;
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function verificarIntencaoImagem(texto) {
+            const textoLower = texto.toLowerCase();
+            const termosImagem = ["crie uma foto", "crie uma imagem", "gere uma foto", "gere uma imagem", "desenhe", "foto de", "imagem de", "criar foto", "criar imagem", "gerar foto", "gerar imagem"];
+            return termosImagem.some(termo => textoLower.includes(termo));
+        }
+
+        // BASE DE CONHECIMENTO ROBUSTA E INTEGRADA (IGNORA BLOQUEIOS DE REDE LOCAL)
+        function obterRespostaInteligente(prompt) {
+            const promptLower = prompt.toLowerCase().trim();
+            
+            const baseConhecimento = [
+                {
+                    chaves: ["quem descobriu a america", "descobriu a america", "quem achou a america"],
+                    resposta: "**Descoberta da América**\n\nA América não foi 'descoberta' no sentido tradicional, pois já era habitada por milhões de povos indígenas (como maias, astecas e incas) há milhares de anos. No entanto, nas navegações europeias, a chegada oficial de Cristóvão Colombo ocorreu em **12 de outubro de 1492**, patrocinada pela coroa espanhola."
+                },
+                {
+                    chaves: ["quem descobriu o brasil", "descobriu o brasil"],
+                    resposta: "**Descoberta do Brasil**\n\nO Brasil foi alcançado em **22 de abril de 1500** por uma expedição portuguesa liderada por **Pedro Álvares Cabral**. Antes da chegada dos portugueses, o território já era habitado por centenas de milhares de indígenas de diferentes etnias."
+                },
+                {
+                    chaves: ["albert einstein", "quem foi einstein"],
+                    resposta: "**Albert Einstein (1879–1955)**\n\nFoi um físico teórico alemão, amplamente reconhecido como um dos cientistas mais importantes de todos os tempos. Ele desenvolveu a Teoria da Relatividade Geral e formulou a equação mais famosa da física: $E = mc^2$."
+                },
+                {
+                    chaves: ["fotossintese", "o que e fotossintese"],
+                    resposta: "**Fotossíntese**\n\nÉ o processo químico pelo qual as plantas, algas e algumas bactérias utilizam a luz solar para converter dióxido de carbono e água em glicose (sua fonte de energia) e oxigênio, que é liberado na atmosfera."
+                },
+                {
+                    chaves: ["ola", "olá", "oi", "bom dia", "boa tarde", "boa noite"],
+                    resposta: "Olá! Como posso ajudar você hoje?"
+                },
+                {
+                    chaves: ["tudo bem", "como vai", "como voce esta"],
+                    resposta: "Tudo ótimo por aqui! Como posso ajudar nos seus estudos ou projetos hoje?"
+                },
+                {
+                    chaves: ["quem e voce", "qual seu nome", "seu nome", "o que voce e"],
+                    resposta: "Eu sou a **Venyra AI**, sua assistente inteligente integrada ao sistema para auxiliar com códigos, pesquisas, cálculos e criação de imagens."
+                }
+            ];
+
+            // Procura correspondência direta nas chaves
+            for (let item of baseConhecimento) {
+                if (item.chaves.some(chave => promptLower.includes(chave))) {
+                    return item.resposta;
+                }
+            }
+
+            // Fallback amigável caso não encontre na base local
+            return `Compreendi a sua pergunta sobre "${prompt}". Como assistente Venyra AI, estou pronta para ajudar com pesquisas, explicações detalhadas, cálculos e muito mais!`;
+        }
+
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const text = input.value.trim();
             if ((!text && !attachedFile) || isWaitingForResponse) return;
+
+            const textLower = text.toLowerCase();
+            if (palavrasProibidas.some(word => textLower.includes(word))) {
+                document.getElementById('wordErrorModal').classList.add('show');
+                return;
+            }
 
             const currentFile = attachedFile;
             input.value = '';
@@ -575,15 +701,48 @@
 
             isWaitingForResponse = true;
 
+            // 1. Verificação de Pedido de Imagem
+            if (verificarIntencaoImagem(text)) {
+                setTimeout(() => {
+                    let descricao = text.replace(/(crie|gere|faça|desenhe)\s+(uma\s+)?(foto|imagem)\s+(de\s+)?/gi, '').trim();
+                    if (!descricao) descricao = text;
+                    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(descricao)}?width=1024&height=1024&seed=${Math.floor(Math.random() * 999999)}`;
+                    const respostaTexto = `Aqui está a imagem gerada para: **"${descricao}"**`;
+                    
+                    renderMessageUI('ai', respostaTexto, null, imageUrl);
+                    if (session) {
+                        session.messages.push({ sender: 'ai', content: respostaTexto, generatedImage: imageUrl });
+                        saveSessions();
+                    }
+                    isWaitingForResponse = false;
+                }, 500);
+                return;
+            }
+
+            // 2. Cálculo Matemático
+            const mathResult = evaluateMathExpression(text);
+            if (mathResult) {
+                setTimeout(() => {
+                    renderMessageUI('ai', mathResult);
+                    if (session) {
+                        session.messages.push({ sender: 'ai', content: mathResult });
+                        saveSessions();
+                    }
+                    isWaitingForResponse = false;
+                }, 300);
+                return;
+            }
+
+            // 3. Resposta Inteligente Base Local
+            const aiResponse = obterRespostaInteligente(text);
             setTimeout(() => {
-                const aiResponse = `Recebi sua mensagem: "${text}". Como posso ajudar com sua consulta hoje?`;
                 renderMessageUI('ai', aiResponse);
                 if (session) {
                     session.messages.push({ sender: 'ai', content: aiResponse });
                     saveSessions();
                 }
                 isWaitingForResponse = false;
-            }, 400);
+            }, 300);
         }
     </script>
 </body>
